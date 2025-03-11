@@ -3,50 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Navegador na Página</title>
+    <title>Página com Navegador</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             font-family: Arial, sans-serif;
             text-align: center;
         }
-        .browser-container {
-            width: 80%;
-            margin: 20px auto;
+        header {
+            background-color: #333;
+            color: white;
+            padding: 15px;
+            font-size: 24px;
+        }
+        section {
+            padding: 20px;
+            margin: 10px 0;
+        }
+        .section-1 {
+            background-color: #f4f4f4;
+        }
+        .section-2 {
+            background-color: #ddd;
+        }
+        .section-3 {
+            background-color: #f4f4f4;
         }
         iframe {
             width: 100%;
             height: 500px;
-            border: 1px solid #ccc;
+            border: none;
         }
     </style>
 </head>
 <body>
 
-    <h1>Mini Navegador na Página</h1>
+    <header>
+        Minha Página com Seções
+    </header>
 
-    <div class="browser-container">
-        <input type="text" id="urlInput" placeholder="Digite a URL e pressione Enter" style="width: 80%;">
-        <button onclick="loadPage()">Ir</button>
-        <iframe id="browserFrame" src="https://www.example.com"></iframe>
-    </div>
+    <section class="section-1">
+        <h2>Seção 1: Introdução</h2>
+        <p>Bem-vindo à minha página! Aqui temos três seções organizadas com um mini navegador.</p>
+    </section>
 
-    <script>
-        function loadPage() {
-            var url = document.getElementById("urlInput").value;
-            if (url) {
-                if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                    url = "https://" + url;
-                }
-                document.getElementById("browserFrame").src = url;
-            }
-        }
-        
-        document.getElementById("urlInput").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                loadPage();
-            }
-        });
-    </script>
+    <section class="section-2">
+        <h2>Seção 2: Navegador (Globoplay)</h2>
+        <iframe src="https://globoplay.globo.com/"></iframe>
+    </section>
+
+    <section class="section-3">
+        <h2>Seção 3: Informações Adicionais</h2>
+        <p>Aqui podemos adicionar mais informações sobre o site, links úteis ou qualquer outro conteúdo.</p>
+    </section>
 
 </body>
 </html>
