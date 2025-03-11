@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Player de Vídeo via Extensão HLS</title>
+    <title>Player de Vídeo HLS</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -24,8 +24,11 @@
             padding: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        iframe {
+        video, iframe {
             width: 100%;
+            height: auto;
+        }
+        iframe {
             height: 450px;
             border: none;
         }
@@ -33,12 +36,14 @@
 </head>
 <body>
     <header>
-        <h1>Player de Vídeo via Extensão HLS</h1>
+        <h1>Player de Vídeo HLS</h1>
     </header>
 
     <section class="video-container">
-        <!-- Iframe para carregar o player da extensão -->
-        <iframe id="hlsPlayerFrame" src=""></iframe>
+        <!-- Player de vídeo para mobile -->
+        <video id="mobilePlayer" controls style="display: none;"></video>
+        <!-- Iframe para carregar o player da extensão (desktop) -->
+        <iframe id="desktopPlayer" src="" style="display: none;"></iframe>
     </section>
 
     <script>
@@ -48,11 +53,49 @@
         // ID da extensão HLS Player
         const extensionId = "eakdijdofmnclopcffkkgmndadhbjgka";
 
-        // Monta a URL do player da extensão
-        const extensionPlayerUrl = `chrome-extension://${extensionId}/player.html#${encodeURIComponent(hlsVideoUrl)}`;
+        // Função para detectar se o usuário está em um dispositivo móvel
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
 
-        // Define a URL do iframe para carregar o player da extensão
-        document.getElementById('hlsPlayerFrame').src = extensionPlayerUrl;
+        // Função para carregar o player de vídeo no mobile usando hls.js
+        function loadMobilePlayer() {
+            const video = document.getElementById('mobilePlayer');
+            if (Hls.isSupported()) {
+                const hls = new Hls();
+                hls.loadSource(hlsVideoUrl);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, function () {
+                    video.play();
+                });
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = hlsVideoUrl;
+                video.addEventListener('loadedmetadata', function () {
+                    video.play();
+                });
+            }
+            video.style.display = 'block';
+        }
+
+        // Função para carregar o player da extensão no desktop
+        function loadDesktopPlayer() {
+            const extensionPlayerUrl = `chrome-extension://${extensionId}/player.html#${encodeURIComponent(hlsVideoUrl)}`;
+            const iframe = document.getElementById('desktopPlayer');
+            iframe.src = extensionPlayerUrl;
+            iframe.style.display = 'block';
+        }
+
+        // Carrega o player apropriado com base no dispositivo
+        if (isMobileDevice()) {
+            // Carrega o player para mobile
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/hls.js@latest';
+            script.onload = loadMobilePlayer;
+            document.head.appendChild(script);
+        } else {
+            // Carrega o player da extensão para desktop
+            loadDesktopPlayer();
+        }
     </script>
 </body>
 </html>
