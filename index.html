@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Player de Vídeo HLS</title>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+    <!-- Video.js CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.5.2/video-js.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.5.2/video.min.js"></script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,12 +17,10 @@
             color: white;
             padding: 20px;
         }
-        video {
+        .video-container {
             width: 80%;
             max-width: 800px;
-            border: 2px solid #fff;
-            display: block;
-            margin: 0 auto;
+            margin: auto;
         }
         button {
             margin-top: 10px;
@@ -35,47 +37,43 @@
 <body>
 
     <h1>Player de Vídeo HLS</h1>
-    <video id="video" controls></video>
+
+    <div class="video-container">
+        <video id="videoPlayer" class="video-js vjs-default-skin" controls preload="auto" width="800" height="450">
+            <source id="videoSource" type="application/x-mpegURL">
+        </video>
+    </div>
+
     <p id="errorMsg"></p>
-    <button onclick="iniciarPlayer()">Recarregar Vídeo</button>
+    <button onclick="recarregarVideo()">Recarregar Vídeo</button>
 
     <script>
-        const videoSrc = "https://live-as-04-13.video.globo.com/j/eyJhbGciOiJSUzUxMiIsImtpZCI6IjEiLCJ0eXAiOiJKV1QifQ.eyJjb3VudHJ5X2NvZGUiOiJCUiIsImRvbWFpbiI6ImxpdmUtYXMtMDQtMTMudmlkZW8uZ2xvYm8uY29tIiwiZXhwIjoxNzQxNjY2OTg4LCJpYXQiOjE3NDE2NTYxODgsImlzcyI6InBsYXliYWNrLWFwaS1wcm9kLWdjcCIsIm93bmVyIjoiNWEyNzAzNjQtYTVkZC00ZTE5LTg1ZGMtNWU1ZmZkNDQ0NWQ3IiwicGF0aCI6Ii9udS9mKGJNYXg9MjI2Mjk3NixpPTIpL2dsb2JvLXZhci9wbGF5bGlzdC5tM3U4In0.IG21Jq3Ls1gSxxAb9pcVD__kpuS2JBfyybDL7rzJeiI8-9DpwLo9TVp8NQgS2aYst0URnKCoCX7g9O6mWDmJ7wEP1lbdYNIBcvfJhd0LSagFRDGDk5znEpIy52UG77COZNn1bEm1jkpapu39x65qUz1S3svM4D7z2zHbbF1xF9RXmISGyeKN11pZFequK0fnEUGj4tuwr70QC2dIWvItFDtLPh2ZAd1cOfPakfOUGUyBvhDwIRgdU3gmVlKz6xUPf9zYp5w1LH8qODSIXa0H03EyAyTJG283N4NdVrQ9ozz1dxXFf5GyTNe10Yi-wtfrA3o1gapwSnxhkLq41-kFwg/nu/f(bMax=2262976,i=2)/globo-var/playlist.m3u8";
+        const videoUrl = "https://live-as-04-13.video.globo.com/j/eyJhbGciOiJSUzUxMiIsImtpZCI6IjEiLCJ0eXAiOiJKV1QifQ.eyJjb3VudHJ5X2NvZGUiOiJCUiIsImRvbWFpbiI6ImxpdmUtYXMtMDQtMTMudmlkZW8uZ2xvYm8uY29tIiwiZXhwIjoxNzQxNjY2OTg4LCJpYXQiOjE3NDE2NTYxODgsImlzcyI6InBsYXliYWNrLWFwaS1wcm9kLWdjcCIsIm93bmVyIjoiNWEyNzAzNjQtYTVkZC00ZTE5LTg1ZGMtNWU1ZmZkNDQ0NWQ3IiwicGF0aCI6Ii9udS9mKGJNYXg9MjI2Mjk3NixpPTIpL2dsb2JvLXZhci9wbGF5bGlzdC5tM3U4In0.IG21Jq3Ls1gSxxAb9pcVD__kpuS2JBfyybDL7rzJeiI8-9DpwLo9TVp8NQgS2aYst0URnKCoCX7g9O6mWDmJ7wEP1lbdYNIBcvfJhd0LSagFRDGDk5znEpIy52UG77COZNn1bEm1jkpapu39x65qUz1S3svM4D7z2zHbbF1xF9RXmISGyeKN11pZFequK0fnEUGj4tuwr70QC2dIWvItFDtLPh2ZAd1cOfPakfOUGUyBvhDwIRgdU3gmVlKz6xUPf9zYp5w1LH8qODSIXa0H03EyAyTJG283N4NdVrQ9ozz1dxXFf5GyTNe10Yi-wtfrA3o1gapwSnxhkLq41-kFwg/nu/f(bMax=2262976,i=2)/globo-var/playlist.m3u8";
 
         function iniciarPlayer() {
-            const video = document.getElementById("video");
+            const video = document.getElementById("videoPlayer");
+            const source = document.getElementById("videoSource");
             const errorMsg = document.getElementById("errorMsg");
+
             errorMsg.textContent = ""; // Limpa mensagens anteriores
+            source.src = videoUrl;
 
-            if (Hls.isSupported()) {
-                const hls = new Hls();
-                hls.loadSource(videoSrc);
-                hls.attachMedia(video);
-                
-                hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                    video.play();
-                });
+            const player = videojs(video);
 
-                hls.on(Hls.Events.ERROR, function(event, data) {
-                    console.error("Erro HLS.js:", data);
+            player.ready(() => {
+                player.src({ src: videoUrl, type: "application/x-mpegURL" });
+                player.play().catch(err => {
                     errorMsg.textContent = "Erro ao carregar o vídeo. Verifique se a URL está ativa.";
+                    console.error("Erro ao iniciar o player:", err);
                 });
-
-            } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-                video.src = videoSrc;
-                video.addEventListener("loadedmetadata", function() {
-                    video.play();
-                });
-                video.addEventListener("error", function() {
-                    errorMsg.textContent = "Erro ao carregar o vídeo no navegador.";
-                });
-
-            } else {
-                errorMsg.textContent = "Seu navegador não suporta HLS.";
-            }
+            });
         }
 
-        iniciarPlayer(); // Executa ao carregar a página
+        function recarregarVideo() {
+            iniciarPlayer();
+        }
+
+        iniciarPlayer(); // Carregar ao iniciar a página
     </script>
 
 </body>
