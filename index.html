@@ -9,6 +9,7 @@
 <body>
     <h1>Player de Vídeo</h1>
     <video id="videoPlayer" width="800" height="450" controls></video>
+    <button id="playButton" style="display: none;">Reproduzir</button>
     <p id="errorMsg"></p>
     
     <script>
@@ -21,7 +22,7 @@
             const video = document.getElementById("videoPlayer");
             const player = new shaka.Player(video);
 
-            // Configurações de DRM, se necessário
+            // Configurações de DRM (se necessário)
             player.configure({
                 drm: {
                     servers: {
@@ -37,16 +38,23 @@
             try {
                 await player.load(videoUrl);
                 console.log("Vídeo carregado com sucesso!");
-                // Tenta iniciar a reprodução automaticamente
-                video.play().catch(() => {
-                    console.log("Autoplay não permitido. O usuário precisa iniciar a reprodução manualmente.");
-                });
+                // Mostra o botão de reprodução
+                document.getElementById("playButton").style.display = "block";
             } catch (err) {
                 document.getElementById("errorMsg").textContent = "Erro ao carregar o vídeo.";
                 console.error("Erro Shaka:", err);
             }
         }
 
+        // Inicia a reprodução quando o botão é clicado
+        document.getElementById("playButton").addEventListener("click", () => {
+            const video = document.getElementById("videoPlayer");
+            video.play().catch((err) => {
+                console.error("Erro ao reproduzir o vídeo:", err);
+            });
+        });
+
+        // Inicializa o Shaka Player quando a página carrega
         document.addEventListener("DOMContentLoaded", iniciarShaka);
     </script>
 </body>
