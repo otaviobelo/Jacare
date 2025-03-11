@@ -1,61 +1,80 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Player Shaka TV LG</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.6/shaka-player.compiled.min.js"></script>
-</head>
-<body>
-    <h1>Player de Vídeo</h1>
-    <video id="videoPlayer" width="800" height="450" controls></video>
-    <button id="playButton" style="display: none;">Reproduzir</button>
-    <p id="errorMsg"></p>
+    <title>Player de Vídeo HLS</title>
     
-    <script>
-        async function iniciarShaka() {
-            if (!shaka.Player.isBrowserSupported()) {
-                document.getElementById("errorMsg").textContent = "Seu navegador não suporta Shaka Player.";
-                return;
-            }
-
-            const video = document.getElementById("videoPlayer");
-            const player = new shaka.Player(video);
-
-            // Configurações de DRM (se necessário)
-            player.configure({
-                drm: {
-                    servers: {
-                        'com.widevine.alpha': 'https://widevine-drm-server-url.com',
-                        'com.microsoft.playready': 'https://playready-drm-server-url.com'
-                    }
-                }
-            });
-
-            // URL do stream HLS
-            const videoUrl = "https://live-as-03-33.video.globo.com/j/eyJhbGciOiJSUzUxMiIsImtpZCI6IjEiLCJ0eXAiOiJKV1QifQ.eyJjb3VudHJ5X2NvZGUiOiJCUiIsImRvbWFpbiI6ImxpdmUtYXMtMDMtMzMudmlkZW8uZ2xvYm8uY29tIiwiZXhwIjoxNzQxNzE2NTM5LCJpYXQiOjE3NDE3MDU3MzksImlzcyI6InBsYXliYWNrLWFwaS1wcm9kLWdjcCIsIm93bmVyIjoiNWEyNzAzNjQtYTVkZC00ZTE5LTg1ZGMtNWU1ZmZkNDQ0NWQ3IiwicGF0aCI6Ii9udS9mKGk9MikvZ2xvYm8tdmFyL3BsYXlsaXN0Lm0zdTgifQ.tdiE_mumn6fJjCtejcmtsW2HnITiD4f4709ukfRprhcfxyxlBa1JmXxWL42ZVpU6Q4ls7Yavp0-PiWjE9A6k39WWCyj9vO2JUdEPcSEjNICou-_uoXjMytQeBvRlOC-8l_5dvOPvlSuouCzrLXoS2FSPLtpjVPqbRgQ_5iqvaabpp9evKXcCIrdY4ORxqUVI4A-h38JDVNtY8TvtC8FYbYDng9SGEQar-Q9AAyR1jXBl889X1iIDlpzFtUDqMsnEJ3xsPGo_zYoRP1KnkxcXspn__sInQyEXfBEKkYjRtzD3x3rwqxYMTHmC1M3rvBhkQKqR2uGY_jyk3_5051vWqg/nu/f(i=2)/globo-var/globo-var-audio_1=96000-video=3442944.m3u8";
-
-            try {
-                await player.load(videoUrl);
-                console.log("Vídeo carregado com sucesso!");
-                // Mostra o botão de reprodução
-                document.getElementById("playButton").style.display = "block";
-            } catch (err) {
-                document.getElementById("errorMsg").textContent = "Erro ao carregar o vídeo.";
-                console.error("Erro Shaka:", err);
-            }
+    <!-- Video.js CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.5.2/video-js.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.5.2/video.min.js"></script>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #222;
+            color: white;
+            padding: 20px;
         }
 
-        // Inicia a reprodução quando o botão é clicado
-        document.getElementById("playButton").addEventListener("click", () => {
-            const video = document.getElementById("videoPlayer");
-            video.play().catch((err) => {
-                console.error("Erro ao reproduzir o vídeo:", err);
-            });
-        });
+        .video-container {
+            width: 80%;
+            max-width: 800px;
+            margin: auto;
+        }
 
-        // Inicializa o Shaka Player quando a página carrega
-        document.addEventListener("DOMContentLoaded", iniciarShaka);
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #errorMsg {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Player de Vídeo HLS</h1>
+    <div class="video-container">
+        <video id="videoPlayer" class="video-js vjs-default-skin" controls preload="auto" width="800" height="450">
+            <source id="videoSource" type="application/x-mpegURL">
+        </video>
+    </div>
+    <p id="errorMsg"></p>
+    <button onclick="recarregarVideo()">Recarregar Vídeo</button>
+
+    <script>
+        const videoUrl = "https://live-as-08-05.video.globo.com/j/eyJhbGciOiJSUzUxMiIsImtpZCI6IjEiLCJ0eXAiOiJKV1QifQ.eyJjb3VudHJ5X2NvZGUiOiJCUiIsImRvbWFpbiI6ImxpdmUtYXMtMDgtMDUudmlkZW8uZ2xvYm8uY29tIiwiZXhwIjoxNzQxNzIzMDU2LCJpYXQiOjE3NDE3MTIyNTYsImlzcyI6InBsYXliYWNrLWFwaS1wcm9kLWdjcCIsIm93bmVyIjoiNWEyNzAzNjQtYTVkZC00ZTE5LTg1ZGMtNWU1ZmZkNDQ0NWQ3IiwicGF0aCI6Ii9udS9mKGk9MikvZ2xvYm8tdmFyL3BsYXlsaXN0Lm0zdTgifQ.emex9DxYcAfR5PdZQjYiDqonafCIwry4-yTlf6yT7nnyEy_0QngfHKpnpizV_Ypx-FumSf70Q4WQhVXM4iKDl2dozzyQeIoaDHvHZBjaoYWyUZVlkwR-cNs3W06XobacqBhtmAzpX8O3fsWmw_6ClnfefXu9oseRMM_zGUZYb3AE_hr8CjInjBXgt-OngP2YFbdl8GgqfF3Pur1hzPcgSXjVCWfnkVgwyxvixd9wDNDoM4Y_KGOnAyGJAxwI4qfymDI0IAGoLJYulHz9d9YMXul0re_XmDh5SD-CTo992rLVoUOisyC_dY56-WY5qWxvDuHrtCe7D_9Or7BfU2aMlQ/nu/f(i=2)/globo-var/globo-var-audio_1=96000-video=3442944.m3u8";
+
+        function iniciarPlayer() {
+            const video = document.getElementById("videoPlayer");
+            const source = document.getElementById("videoSource");
+            const errorMsg = document.getElementById("errorMsg");
+            errorMsg.textContent = ""; // Limpa mensagens anteriores
+            source.src = videoUrl;
+            
+            const player = videojs(video);
+            player.ready(() => {
+                player.src({ src: videoUrl, type: "application/x-mpegURL" });
+                player.play().catch(err => {
+                    errorMsg.textContent = "Erro ao carregar o vídeo. Verifique se a URL está ativa.";
+                    console.error("Erro ao iniciar o player:", err);
+                });
+            });
+        }
+
+        function recarregarVideo() {
+            iniciarPlayer();
+        }
+
+        iniciarPlayer(); // Carregar ao iniciar a página
     </script>
 </body>
+
 </html>
