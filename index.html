@@ -208,7 +208,7 @@
         let youtubeApiLoaded = false;
         
         async function loadPlaylist() {
-            const response = await fetch("https://raw.githubusercontent.com/iptv-org/iptv/refs/heads/master/streams/ae.m3u");
+            const response = await fetch("https://raw.githubusercontent.com/otaviobelo/lista99/refs/heads/main/pacote-02.m3u");
             const text = await response.text();
             const channels = [];
             const lines = text.split("\n");
